@@ -38,7 +38,7 @@ def indexpage(request):
 
     else:
         if samples_df.empty:
-            return render(request, 'labs/index.html', {})
+            return render(request, 'labs/index.html', context)
 
         else:
             YEAR = years[0]
@@ -80,7 +80,7 @@ def sample(request):
         return render(request, 'labs/sample.html', context)
     else:
         if samples_df.empty:
-            return render(request, 'labs/sample.html', {})
+            return render(request, 'labs/sample.html', context)
         else:
             YEAR = years[0]
             MONTH = months[0]
@@ -124,7 +124,7 @@ def util(request):
         return render(request, 'labs/utilization.html', context)
     else:
         if util_df.empty:
-            return render(request, 'labs/utilization.html', {})
+            return render(request, 'labs/utilization.html', context)
         else:
             YEAR = years[0]
             MONTH = months[0]
@@ -169,7 +169,7 @@ def revenue(request):
         return render(request, 'labs/revenue.html', context)
     else:
         if revenue_df.empty:
-            return render(request, 'labs/revenue.html')
+            return render(request, 'labs/revenue.html', context)
         else:
             YEAR = years[0]
             MONTH = months[0]
