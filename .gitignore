@@ -12,9 +12,8 @@ data/
 *.log
 
 # venv
-env
-venv
 .env
+venv
 # other
 .DS_Store
 
