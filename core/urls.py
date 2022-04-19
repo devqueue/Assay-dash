@@ -4,6 +4,8 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf import settings
 from django.urls import path, include  # add this
 
 urlpatterns = [
@@ -11,3 +13,9 @@ urlpatterns = [
     path("", include("apps.authentication.urls")), # Auth routes - login / register
     path("", include("apps.home.urls"))             # UI Kits Html files
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.STATIC_URL,
+        document_root=settings.STATIC_URL,
+    )
