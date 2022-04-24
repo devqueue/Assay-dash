@@ -3,9 +3,10 @@ from .forms import CsvModelForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import pandas as pd
-from .models import MissedRevenue, Utilization, Samples, Revenue, monthlystats, Csv, stats
+from .models import MissedRevenue, Utilization, Samples, Revenue, monthlystats, stats
 from .serializers import UtilizationSerializer, SamplesSerializer, RevenueSerializer, monthlystatsSerializer
 from .viewfuncs import index_context, sample_context, util_context, revenue_context
+import traceback
 # Create your views here.
 
 
@@ -214,7 +215,8 @@ def upload_file(request):
             ) for rec in df_stats]
             try:
                 stats.objects.bulk_create(stats_instances)
-            except:
+            except Exception:
+                traceback.print_exc()
                 stats.objects.bulk_update(stats_instances, fields=[
                                           'FullCapacity', 'RunTime', 'Price', 'Maintenance'])
 
@@ -241,10 +243,11 @@ def upload_file(request):
 
             try:
                 Samples.objects.bulk_create(sample_instances)
-            except:
+            except Exception:
                 Samples.objects.bulk_update(sample_instances,
                                             fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
                                                     'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
+                traceback.print_exc()
 
             # Populate the revenue
             revenue_dict = calculate_revenue(df_samples, df_stats)
@@ -269,10 +272,11 @@ def upload_file(request):
 
             try:
                 Revenue.objects.bulk_create(Revenue_instances)
-            except:
+            except Exception:
                 Revenue.objects.bulk_update(Revenue_instances,
                                             fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
                                                     'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
+                traceback.print_exc()
 
             # Populate the utilization
             utilization_dict = calculate_utilization(df_samples, df_stats)
@@ -297,10 +301,11 @@ def upload_file(request):
 
             try:
                 Utilization.objects.bulk_create(util_instances)
-            except:
+            except Exception:
                 Utilization.objects.bulk_update(util_instances,
                                                 fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
                                                         'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
+                traceback.print_exc()
 
             # Populate the monthly stats
             monthly_stats = get_fullcapacity(df_samples, df_stats)
@@ -314,9 +319,10 @@ def upload_file(request):
 
             try:
                 monthlystats.objects.bulk_create(mstats_instances)
-            except:
+            except Exception:
                 monthlystats.objects.bulk_update(mstats_instances,
                                                  fields=['MaxMonthlyhours', 'MaxMonthlyRevenue', 'MaxMonthSamples'])
+                traceback.print_exc()
 
             # Populate the missed revenue
             missed_dict = calculate_missedrevenue(revenue_dict, df_stats)
@@ -342,18 +348,21 @@ def upload_file(request):
 
             try:
                 MissedRevenue.objects.bulk_create(Missed_instances)
-            except:
+            except Exception:
                 MissedRevenue.objects.bulk_update(Missed_instances,
                                                   fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
                                                           'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
+                traceback.print_exc()
+
             context['icon'] = 'success'
             context['Title'] = 'Success'
             context['Text'] = 'Your file has been uploaded sucessfully'
             form.cleaned_data['activated'] = True
             form.save()
-        except:
+        except Exception:
             context['icon'] = 'error'
             context['Title'] = 'Error'
             context['Text'] = "Invalid file data. An error occured, please upload again"
+            traceback.print_exc()
 
     return render(request, 'labs/upload.html', context)
