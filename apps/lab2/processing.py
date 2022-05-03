@@ -27,12 +27,12 @@ def normalize_index(index):
 def create_stats():
     df_stats = pd.DataFrame({
         "Price": [125, 275, 400, 500, 400, 350],
-        "Run time": [2, 45, 120, 20, 20, 1],
+        "Run time": [24, 24, 24, 24, 24, 24],
         "Full capacity": [6240, 6240, 6240, 6240, 6240, 6240],
         "Maintenance": [520, 520, 520, 520, 520, 520],
-        "MachineID": ["FI-MSMS", "GC-MS", "Amino acid analyzer", "LC-MSMS-1", "LC-MSMS-2", "Spectrophotometer"],
-        "AssayID": ["SICKPANEL", "OA", "AAA", "VLCFA", "MMA", "SERUM"]
-    }, index=["SICKPANEL", "OA", "AAA", "VLCFA", "MMA", "SERUM"])
+        "MachineID": ["Nova seq 1", "Nova seq 2", "Nova seq 3", "Nova seq 4", "Nova seq 5", "Nova seq 6"],
+        "AssayID": ["wes", "wes2", "wes3", "wes4", "wes5", "wes6"]
+    }, index=["wes", "wes2", "wes3", "wes4", "wes5", "wes6"])
 
     records = df_stats.to_dict('records')
     return records
