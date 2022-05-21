@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.home',  # Enable the inner home (home)
     'apps.lab1',
     'apps.lab2',
+    'apps.lab3',
 ]
 
 MIDDLEWARE = [
