@@ -13,6 +13,7 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('lab1/', include('apps.lab1.urls')),
     path('lab2/', include('apps.lab2.urls')),
+    path('lab3/', include('apps.lab3.urls')),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
