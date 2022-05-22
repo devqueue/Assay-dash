@@ -1,4 +1,7 @@
 
+from traceback import print_tb
+
+
 def index_context(YEAR, MONTH, MACHINE, samples_df, revenue_df):
     years = samples_df['Year'].unique()
     machines = samples_df['MachineID'].unique()
@@ -44,7 +47,6 @@ def sample_context(YEAR, MONTH, YEAR2, MACHINE, samples_df, monthlystats_df):
 
     samples_year = samples_df.loc[samples_df['Year'] == int(YEAR)]
     machine_samples = samples_year[[MONTH, 'MachineID']]
-
     maxmonthly_samples = monthlystats_df['MaxMonthSamples'].values
     collected_samples = machine_samples[MONTH].values
 

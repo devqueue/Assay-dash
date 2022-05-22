@@ -208,7 +208,7 @@ def upload_file(request):
             stats_instances = [stats(
                 AssayID=rec['AssayID'],
                 MachineID=rec['MachineID'],
-                Maintenance=rec['Maintenance'],
+                # Maintenance=rec['Maintenance'],
                 FullCapacity=rec['Full capacity'],
                 RunTime=rec['Run time'],
                 Price=rec['Price']
