@@ -1,7 +1,4 @@
 
-from traceback import print_tb
-
-
 def index_context(YEAR, MONTH, MACHINE, samples_df, revenue_df):
     years = samples_df['Year'].unique()
     machines = samples_df['MachineID'].unique()
@@ -31,7 +28,7 @@ def index_context(YEAR, MONTH, MACHINE, samples_df, revenue_df):
         'sel_machine': MACHINE,
         'machine_index': machine_index[MONTH].to_list(),
         'machine_labels': machine_index['MachineID'].to_list(),
-        'monthly_index': monthly_index.values.reshape(12).tolist(),
+        'monthly_index': monthly_index.values[0].reshape(12).tolist(),
         'monthly_labels': monthly_index.columns.tolist(),
         'revenue_lables': revenue_labels.to_list(),
         'revenue_values': list(y)
@@ -91,6 +88,7 @@ def sample_context(YEAR, MONTH, YEAR2, MACHINE, samples_df, monthlystats_df):
 
 
 def util_context(YEAR, MONTH, YEAR2, MACHINE, util_df, monthlystats_df):
+    print(util_df)
     years = util_df['Year'].unique()
     months = [col for col in util_df.columns if col not in (
         'AssayID', 'Assay', 'Year', 'MachineID')]
@@ -103,7 +101,7 @@ def util_context(YEAR, MONTH, YEAR2, MACHINE, util_df, monthlystats_df):
     actual_utilizition = machine_util[MONTH].values
 
     missed_util = maxmonthly_util - actual_utilizition
-
+    print(machines)
     # graph2
     util_df['Total'] = util_df.drop(
         'Year', axis=1).sum(axis=1, numeric_only=True)
