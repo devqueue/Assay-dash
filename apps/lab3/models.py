@@ -7,19 +7,24 @@ class Samples(Samples):
     pass
 
 class Utilization(Utilization):
-    pass
+    AssayID = models.CharField(max_length=50)
+    MachineID = models.CharField(primary_key=True, max_length=100)
 
 class Revenue(Revenue):
-    pass
+    AssayID = models.CharField(max_length=50)
+    MachineID = models.CharField(primary_key=True, max_length=100)
 
 class MissedRevenue(MissedRevenue):
-    pass
+    AssayID = models.CharField(max_length=50)
+    MachineID = models.CharField(primary_key=True, max_length=100)
 
 class stats(stats):
-    pass
+    AssayID = models.CharField(max_length=50)
+    MachineID = models.CharField(primary_key=True, max_length=100)
 
 class monthlystats(monthlystats):
-    pass
+    AssayID = models.CharField(max_length=50)
+    MachineID = models.CharField(primary_key=True, max_length=100)
 
 class Csv(Csv):
     pass
