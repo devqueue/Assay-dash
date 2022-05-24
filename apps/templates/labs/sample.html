@@ -95,7 +95,7 @@ $(document).ready(function () {
  const data = {
       labels: [{% for i in machine_labels %} '{{i}}', {% endfor %}],
       datasets: [{
-        label: 'Collected samples',
+        label: 'Actual samples',
         data: [{% for i in collected_samples %} {{i}}, {% endfor %}],
         backgroundColor: [
           'rgba(75, 192, 192, 0.2)',
@@ -106,7 +106,7 @@ $(document).ready(function () {
         borderWidth: 1
       },
       {
-        label: 'Missed samples',
+        label: 'Potential samples',
         data: [{% for i in missed_samples %} {{i}}, {% endfor %}],
         backgroundColor: [
           'rgba(255, 26, 104, 0.2)',
