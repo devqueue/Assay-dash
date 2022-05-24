@@ -56,7 +56,6 @@
 <div class="col-md-6 pt-1">
 <label for="year2">Year: </label>
 <select name="year2" id="year2" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
-    <option value="All">All years</option>
     {% for year in years %}
     <option value="{{year}}">{{year}}</option>
     {% endfor %}
