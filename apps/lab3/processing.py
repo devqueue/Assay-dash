@@ -71,9 +71,9 @@ def calculate_utilization(df_year_dict, stats_dict):
         df_year.columns == 'Year') | (df_year.columns == 'MachineID'))]
     runtime = (df_stats['Run time'].values).reshape(
         len(df_only_sample), 1) / np.full(shape=(len(df_only_sample), 1), fill_value=60)
-        
-    formula = ((df_only_sample.values * runtime))
 
+    formula = ((df_only_sample.values * runtime))
+    
     df_util = pd.DataFrame(
         formula, columns=df_only_sample.columns, index=df_only_sample.index)
     df_util = df_util.round(2)
