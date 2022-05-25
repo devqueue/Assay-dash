@@ -26,13 +26,13 @@ def normalize_index(index):
 
 def create_stats():
     df_stats = pd.DataFrame({
-        "Price": [125, 275, 400, 500, 400, 350],
-        "Run time": [24, 24, 24, 24, 24, 24],
-        "Full capacity": [6240, 6240, 6240, 6240, 6240, 6240],
-        "Maintenance": [520, 520, 520, 520, 520, 520],
-        "MachineID": ["Nova seq 1", "Nova seq 2", "Nova seq 3", "Nova seq 4", "Nova seq 5", "Nova seq 6"],
-        "AssayID": ["wes", "wes2", "wes3", "wes4", "wes5", "wes6"]
-    }, index=["wes", "wes2", "wes3", "wes4", "wes5", "wes6"])
+        "Price": [1000]*3,
+        "Run time": [5760/96]*3,
+        "Full capacity": [8736]*3,
+        "Maintenance": [0]*3,
+        "MachineID": ["Nova seq 1", "Nova seq 2", "Nova seq 3"],
+        "AssayID": ["wes", "wes2", "wes3", ]
+    }, index=["wes", "wes2", "wes3"])
 
     records = df_stats.to_dict('records')
     return records
@@ -48,7 +48,7 @@ def calculate_revenue(df_year_dict, stats_dict):
     df_only_sample = df_year.loc[:, ~((df_year.columns == 'Assay') | (
         df_year.columns == 'Year') | (df_year.columns == 'MachineID'))]
     df_revenue = pd.DataFrame(df_only_sample.values*(df_stats.Price.values).reshape(
-        6, 1), columns=df_only_sample.columns, index=df_only_sample.index)
+        len(df_year), 1), columns=df_only_sample.columns, index=df_only_sample.index)
     df_revenue.insert(loc=0, column='Assay', value=df_year['Assay'])
     df_revenue['Year'] = df_year['Year']
     df_revenue['AssayID'] = df_year.index
@@ -68,7 +68,7 @@ def calculate_utilization(df_year_dict, stats_dict):
     df_only_sample = df_year.loc[:, ~((df_year.columns == 'Assay') | (
         df_year.columns == 'Year') | (df_year.columns == 'MachineID'))]
     runtime = (df_stats['Run time'].values).reshape(
-        6, 1) / np.full(shape=(6, 1), fill_value=60)
+        len(df_year), 1) / np.full(shape=(len(df_year), 1), fill_value=60)
     formula = ((df_only_sample.values * runtime))
 
     df_util = pd.DataFrame(
@@ -88,10 +88,10 @@ def get_fullcapacity(df_year_dict, stats_dict):
     df_stats = pd.DataFrame(stats_dict)
 
     fullcap = ((df_stats['Full capacity'].values).reshape(
-        6, 1) - df_stats["Maintenance"].values.reshape(6, 1)) / np.full(shape=(6, 1), fill_value=12)
+        len(df_year), 1) - df_stats["Maintenance"].values.reshape(len(df_year), 1)) / np.full(shape=(len(df_year), 1), fill_value=12)
     runtime = (df_stats['Run time'].values).reshape(
-        6, 1) / np.full(shape=(6, 1), fill_value=60)
-    price = (df_stats['Price'].values).reshape(6, 1)
+        len(df_year), 1) / np.full(shape=(len(df_year), 1), fill_value=60)
+    price = (df_stats['Price'].values).reshape(len(df_year), 1)
 
     fullcap_samples = fullcap / runtime
 
@@ -118,15 +118,18 @@ def calculate_missedrevenue(df_revenue_dict, stats_dict):
     actual_revenue = df_only_revenue.values
 
     fullcap = (df_stats['Full capacity'].values).reshape(
-        6, 1) / np.full(shape=(6, 1), fill_value=12)
-    fullcap = (np.repeat(fullcap[:, :, np.newaxis], 12, axis=2)).reshape(6, 12)
+        len(df_revenue), 1) / np.full(shape=(len(df_revenue), 1), fill_value=12)
+    fullcap = (np.repeat(fullcap[:, :, np.newaxis], 12, axis=2)).reshape(
+        len(df_revenue), 12)
 
     runtime = (df_stats['Run time'].values).reshape(
-        6, 1) / np.full(shape=(6, 1), fill_value=60)
-    runtime = (np.repeat(runtime[:, :, np.newaxis], 12, axis=2)).reshape(6, 12)
+        len(df_revenue), 1) / np.full(shape=(len(df_revenue), 1), fill_value=60)
+    runtime = (np.repeat(runtime[:, :, np.newaxis], 12, axis=2)).reshape(
+        len(df_revenue), 12)
 
-    price = (df_stats['Price'].values).reshape(6, 1)
-    price = (np.repeat(price[:, :, np.newaxis], 12, axis=2)).reshape(6, 12)
+    price = (df_stats['Price'].values).reshape(len(df_revenue), 1)
+    price = (np.repeat(price[:, :, np.newaxis], 12,
+             axis=2)).reshape(len(df_revenue), 12)
 
     fullcap_samples = fullcap / runtime
     full_revenue = fullcap_samples * price
