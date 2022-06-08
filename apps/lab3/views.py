@@ -21,6 +21,9 @@ def indexpage(request):
 
     samples_df = pd.DataFrame(samples_serializer.data)
     revenue_df = pd.DataFrame(revenue_serializer.data)
+    print("samples")
+    print(samples_df)
+    print(revenue_df)
 
     if not samples_df.empty:
         years = samples_df['Year'].unique()
@@ -196,10 +199,6 @@ def upload_file(request):
         file_name = form.cleaned_data.get('file_name')
         file_path = form.cleaned_data.get('file_name').temporary_file_path()
 
-        # form.save()
-        # form = CsvModelForm()
-        # obj = Csv.objects.get(activated=False)
-
         # Processing CSV FILES
 
         # Populate the stats
@@ -223,9 +222,7 @@ def upload_file(request):
             # Populate the samples
             df_samples = create_df(file_path)
             sample_instances = [Samples(
-                AssayID=record['AssayID'],
                 MachineID=record['MachineID'],
-                Assay=record['Assay'],
                 January=record['January'],
                 February=record['February'],
                 March=record['March'],
@@ -245,16 +242,14 @@ def upload_file(request):
                 Samples.objects.bulk_create(sample_instances)
             except Exception:
                 Samples.objects.bulk_update(sample_instances,
-                                            fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
+                                            fields=['January', 'February', 'March', 'April', 'May', 'June',
                                                     'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
                 traceback.print_exc()
 
             # Populate the revenue
             revenue_dict = calculate_revenue(df_samples, df_stats)
             Revenue_instances = [Revenue(
-                # AssayID=record['AssayID'],
                 MachineID=record['MachineID'],
-                # Assay=record['Assay'],
                 January=record['January'],
                 February=record['February'],
                 March=record['March'],
@@ -274,7 +269,7 @@ def upload_file(request):
                 Revenue.objects.bulk_create(Revenue_instances)
             except Exception:
                 Revenue.objects.bulk_update(Revenue_instances,
-                                            fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
+                                            fields=['January', 'February', 'March', 'April', 'May', 'June',
                                                     'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
                 traceback.print_exc()
 
@@ -282,9 +277,7 @@ def upload_file(request):
             utilization_dict = calculate_utilization(df_samples, df_stats)
             
             util_instances = [Utilization(
-                # AssayID=record['AssayID'],
                 MachineID=record['MachineID'],
-                # Assay=record['Assay'],
                 January=record['January'],
                 February=record['February'],
                 March=record['March'],
@@ -304,14 +297,13 @@ def upload_file(request):
                 Utilization.objects.bulk_create(util_instances)
             except Exception:
                 Utilization.objects.bulk_update(util_instances,
-                                                fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
+                                                fields=['January', 'February', 'March', 'April', 'May', 'June',
                                                         'July', 'August', 'September', 'October', 'November', 'December', ])
                 traceback.print_exc()
 
             # Populate the monthly stats
             monthly_stats = get_fullcapacity(df_samples, df_stats)
             mstats_instances = [monthlystats(
-                # AssayID=rec['AssayID'],
                 MachineID=rec['MachineID'],
                 MaxMonthlyhours=rec['MaxMonthlyhours'],
                 MaxMonthlyRevenue=rec['MaxMonthlyRevenue'],
@@ -329,9 +321,7 @@ def upload_file(request):
             missed_dict = calculate_missedrevenue(revenue_dict, df_stats)
 
             Missed_instances = [MissedRevenue(
-                # AssayID=record['AssayID'],
                 MachineID=record['MachineID'],
-                # Assay=record['Assay'],
                 January=record['January'],
                 February=record['February'],
                 March=record['March'],
@@ -351,7 +341,7 @@ def upload_file(request):
                 MissedRevenue.objects.bulk_create(Missed_instances)
             except Exception:
                 MissedRevenue.objects.bulk_update(Missed_instances,
-                                                  fields=['Assay', 'January', 'February', 'March', 'April', 'May', 'June',
+                                                  fields=['January', 'February', 'March', 'April', 'May', 'June',
                                                           'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
                 traceback.print_exc()
 
