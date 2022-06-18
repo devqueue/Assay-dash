@@ -3,8 +3,9 @@ from .forms import CsvModelForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import pandas as pd
-from .models import MissedRevenue, Utilization, Samples, Revenue, monthlystats, stats
-from .serializers import UtilizationSerializer, SamplesSerializer, RevenueSerializer, monthlystatsSerializer
+from .models import MissedRevenueMachine, UtilizationMachine, SamplesMachine, RevenueMachine, monthlystatsMachine, statsMachine, SamplesAssay, UtilizationAssay, RevenueAssay, MissedRevenueAssay, monthlystatsAssay, statsAssay
+
+from .serializers import UtilizationSerializer, SamplesSerializer, RevenueSerializer, monthlystatsSerializer, AssayUtilizationSerializer, AssaySamplesSerializer, AssayRevenueSerializer, AssaymonthlystatsSerializer
 from .viewfuncs import index_context, sample_context, util_context, revenue_context
 import traceback
 # Create your views here.
@@ -14,16 +15,13 @@ def indexpage(request):
     context = {
         'segment': 'lab3-index',
     }
-    samples_obj = Samples.objects.all()
-    revenue_obj = Revenue.objects.all()
+    samples_obj = SamplesMachine.objects.all()
+    revenue_obj = SamplesMachine.objects.all()
     samples_serializer = SamplesSerializer(samples_obj, many=True)
     revenue_serializer = RevenueSerializer(revenue_obj, many=True)
 
     samples_df = pd.DataFrame(samples_serializer.data)
     revenue_df = pd.DataFrame(revenue_serializer.data)
-    print("samples")
-    print(samples_df)
-    print(revenue_df)
 
     if not samples_df.empty:
         years = samples_df['Year'].unique()
@@ -57,8 +55,8 @@ def sample(request):
     context = {
         'segment': 'lab3-samples',
     }
-    samples_obj = Samples.objects.all()
-    monthlystats_obj = monthlystats.objects.all()
+    samples_obj = SamplesMachine.objects.all()
+    monthlystats_obj = monthlystatsMachine.objects.all()
 
     samples_serializer = SamplesSerializer(samples_obj, many=True)
     monthlystats_serializer = monthlystatsSerializer(
@@ -100,8 +98,8 @@ def util(request):
     context = {
         'segment': 'lab3-util',
     }
-    util_obj = Utilization.objects.all()
-    monthlystats_obj = monthlystats.objects.all()
+    util_obj = UtilizationMachine.objects.all()
+    monthlystats_obj = monthlystatsMachine.objects.all()
 
     util_serializer = UtilizationSerializer(util_obj, many=True)
     monthlystats_serializer = monthlystatsSerializer(
@@ -145,8 +143,8 @@ def revenue(request):
     context = {
         'segment': 'lab3-revenue',
     }
-    revenue_obj = Revenue.objects.all()
-    monthlystats_obj = monthlystats.objects.all()
+    revenue_obj = RevenueMachine.objects.all()
+    monthlystats_obj = monthlystatsMachine.objects.all()
 
     revenue_serializer = RevenueSerializer(revenue_obj, many=True)
     monthlystats_serializer = monthlystatsSerializer(
@@ -203,25 +201,57 @@ def upload_file(request):
 
         # Populate the stats
         try:
-            df_stats = create_stats()
-            stats_instances = [stats(
-                # AssayID=rec['AssayID'],
-                MachineID=rec['MachineID'],
-                # Maintenance=rec['Maintenance'],
+            df_assay_stats, df_machine_stats  = create_stats()
+
+            Assay_stats_instances = [statsAssay(
+                AssayID=rec['AssayID'],
+                # MachineID=rec['MachineID'],
+                Maintenance=rec['Maintenance'],
                 FullCapacity=rec['Full capacity'],
                 RunTime=rec['Run time'],
                 Price=rec['Price']
-            ) for rec in df_stats]
-            try:
-                stats.objects.bulk_create(stats_instances)
-            except Exception:
-                traceback.print_exc()
-                stats.objects.bulk_update(stats_instances, fields=[
-                                          'FullCapacity', 'RunTime', 'Price'])
+            ) for rec in df_assay_stats]
 
+            Machine_stats_instances = [statsMachine(
+                # AssayID=rec['AssayID'],
+                MachineID=rec['MachineID'],
+                Maintenance=rec['Maintenance'],
+                FullCapacity=rec['Full capacity'],
+                RunTime=rec['Run time'],
+                Price=rec['Price']
+            ) for rec in df_machine_stats]
+
+
+            # print(pd.DataFrame(df_machine_stats))
+            for row_assay in Assay_stats_instances:
+                row_assay.save()
+
+            for row_machine in Machine_stats_instances:
+                row_machine.save()
+                
+            
             # Populate the samples
-            df_samples = create_df(file_path)
-            sample_instances = [Samples(
+            df_sample_assay, df_sample_machine = create_df(file_path)
+
+            assay_sample_instances = [SamplesAssay(
+                AssayID=record['AssayID'],
+                Assay=record['Assay'],
+                January=record['January'],
+                February=record['February'],
+                March=record['March'],
+                April=record['April'],
+                May=record['May'],
+                June=record['June'],
+                July=record['July'],
+                August=record['August'],
+                September=record['September'],
+                October=record['October'],
+                November=record['November'],
+                December=record['December'],
+                Year=record['Year']
+            ) for record in df_sample_assay]
+
+            Machine_sample_instances = [SamplesMachine(
                 MachineID=record['MachineID'],
                 January=record['January'],
                 February=record['February'],
@@ -236,19 +266,41 @@ def upload_file(request):
                 November=record['November'],
                 December=record['December'],
                 Year=record['Year']
-            ) for record in df_samples]
+            ) for record in df_sample_machine]
 
-            try:
-                Samples.objects.bulk_create(sample_instances)
-            except Exception:
-                Samples.objects.bulk_update(sample_instances,
-                                            fields=['January', 'February', 'March', 'April', 'May', 'June',
-                                                    'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
-                traceback.print_exc()
+
+            for row_assay in assay_sample_instances:
+                row_assay.save()
+
+
+            for row_machine in Machine_sample_instances:
+                row_machine.save()
+                
 
             # Populate the revenue
-            revenue_dict = calculate_revenue(df_samples, df_stats)
-            Revenue_instances = [Revenue(
+            df_revenue_assay, df_revenue_machine = calculate_revenue(
+                df_sample_assay, df_sample_machine, df_assay_stats, df_machine_stats)
+            
+            Revenue_Assay = [RevenueAssay(
+                AssayID=record['AssayID'],
+                Assay=record['Assay'],
+                January=record['January'],
+                February=record['February'],
+                March=record['March'],
+                April=record['April'],
+                May=record['May'],
+                June=record['June'],
+                July=record['July'],
+                August=record['August'],
+                September=record['September'],
+                October=record['October'],
+                November=record['November'],
+                December=record['December'],
+                Year=record['Year']
+            ) for record in df_revenue_assay]
+            
+
+            Revenue_machine = [RevenueMachine(
                 MachineID=record['MachineID'],
                 January=record['January'],
                 February=record['February'],
@@ -263,20 +315,38 @@ def upload_file(request):
                 November=record['November'],
                 December=record['December'],
                 Year=record['Year']
-            ) for record in revenue_dict]
+            ) for record in df_revenue_machine]
 
-            try:
-                Revenue.objects.bulk_create(Revenue_instances)
-            except Exception:
-                Revenue.objects.bulk_update(Revenue_instances,
-                                            fields=['January', 'February', 'March', 'April', 'May', 'June',
-                                                    'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
-                traceback.print_exc()
+            for row_assay in Revenue_Assay:
+                row_assay.save()
+
+
+            for row_machine in Revenue_machine:
+                row_machine.save()
 
             # Populate the utilization
-            utilization_dict = calculate_utilization(df_samples, df_stats)
+            df_util_assay, df_util_machine = calculate_utilization(
+                df_sample_assay, df_sample_machine, df_assay_stats, df_machine_stats)
+
+            Util_Assay = [UtilizationAssay(
+                AssayID=record['AssayID'],
+                Assay=record['Assay'],
+                January=record['January'],
+                February=record['February'],
+                March=record['March'],
+                April=record['April'],
+                May=record['May'],
+                June=record['June'],
+                July=record['July'],
+                August=record['August'],
+                September=record['September'],
+                October=record['October'],
+                November=record['November'],
+                December=record['December'],
+                Year=record['Year']
+            ) for record in df_util_assay]
             
-            util_instances = [Utilization(
+            util_machine = [UtilizationMachine(
                 MachineID=record['MachineID'],
                 January=record['January'],
                 February=record['February'],
@@ -291,36 +361,63 @@ def upload_file(request):
                 November=record['November'],
                 December=record['December'],
                 Year=record['Year']
-            ) for record in utilization_dict]
+            ) for record in df_util_machine]
 
-            try:
-                Utilization.objects.bulk_create(util_instances)
-            except Exception:
-                Utilization.objects.bulk_update(util_instances,
-                                                fields=['January', 'February', 'March', 'April', 'May', 'June',
-                                                        'July', 'August', 'September', 'October', 'November', 'December', ])
-                traceback.print_exc()
+
+            for row_assay in Util_Assay:
+                row_assay.save()
+
+            for row_machine in util_machine:
+                row_machine.save()
+
+
 
             # Populate the monthly stats
-            monthly_stats = get_fullcapacity(df_samples, df_stats)
-            mstats_instances = [monthlystats(
+            monthly_stats_assay, monthly_stats_machine = get_fullcapacity(df_assay_stats, df_machine_stats)
+
+            stats_assay = [monthlystatsAssay(
+                AssayID=rec['AssayID'],
+                MaxMonthlyhours=rec['MaxMonthlyhours'],
+                MaxMonthlyRevenue=rec['MaxMonthlyRevenue'],
+                MaxMonthSamples=rec['MaxMonthlySamples']
+            ) for rec in monthly_stats_assay]
+
+            stats_machine = [monthlystatsMachine(
                 MachineID=rec['MachineID'],
                 MaxMonthlyhours=rec['MaxMonthlyhours'],
                 MaxMonthlyRevenue=rec['MaxMonthlyRevenue'],
                 MaxMonthSamples=rec['MaxMonthlySamples']
-            ) for rec in monthly_stats]
+            ) for rec in monthly_stats_machine]
 
-            try:
-                monthlystats.objects.bulk_create(mstats_instances)
-            except Exception:
-                monthlystats.objects.bulk_update(mstats_instances,
-                                                 fields=['MaxMonthlyhours', 'MaxMonthlyRevenue', 'MaxMonthSamples'])
-                traceback.print_exc()
+            for row_assay in stats_assay:
+                row_assay.save()
+
+            for row_machine in stats_machine:
+                row_machine.save()
+
 
             # Populate the missed revenue
-            missed_dict = calculate_missedrevenue(revenue_dict, df_stats)
+            df_missed_assay, df_Missed_machine = calculate_missedrevenue(
+                df_revenue_assay, df_revenue_machine, df_assay_stats, df_machine_stats)
 
-            Missed_instances = [MissedRevenue(
+            Missed_Assay = [MissedRevenueAssay(
+                AssayID=record['AssayID'],
+                January=record['January'],
+                February=record['February'],
+                March=record['March'],
+                April=record['April'],
+                May=record['May'],
+                June=record['June'],
+                July=record['July'],
+                August=record['August'],
+                September=record['September'],
+                October=record['October'],
+                November=record['November'],
+                December=record['December'],
+                Year=record['Year']
+            ) for record in df_missed_assay]
+
+            Missed_machine = [MissedRevenueMachine(
                 MachineID=record['MachineID'],
                 January=record['January'],
                 February=record['February'],
@@ -335,15 +432,13 @@ def upload_file(request):
                 November=record['November'],
                 December=record['December'],
                 Year=record['Year']
-            ) for record in missed_dict]
+            ) for record in df_Missed_machine]
 
-            try:
-                MissedRevenue.objects.bulk_create(Missed_instances)
-            except Exception:
-                MissedRevenue.objects.bulk_update(Missed_instances,
-                                                  fields=['January', 'February', 'March', 'April', 'May', 'June',
-                                                          'July', 'August', 'September', 'October', 'November', 'December', 'Year'])
-                traceback.print_exc()
+            for row_assay in Missed_Assay:
+                row_assay.save()
+
+            for row_machine in Missed_machine:
+                row_machine.save()
 
             context['icon'] = 'success'
             context['Title'] = 'Success'
