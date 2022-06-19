@@ -61,7 +61,6 @@
 </select>
 </div>
 </div>
-</form>
 
 <br>
 <div class="chartMenu">
@@ -72,7 +71,50 @@
     </div>
 </div>
 <br>
+
+<div class="row">
+
+    <div class="col-md-6 pt-1">
+        <label for="assay3">Machines: </label>
+        <select name="assay3" id="assay3" onchange="setScroll();this.form.submit();" class="form-select form-select-sm"
+            aria-label=".form-select-sm example">
+            {% for as in Machines %}
+            <option value="{{as}}">{{as}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-6 pt-1">
+      <label for="month3">Month: </label>
+      <select name="month3" id="month3" onchange="setScroll();this.form.submit();" class="form-select form-select-sm"
+        aria-label=".form-select-sm example">
+        {% for month in Months %}
+        <option value="{{month}}">{{month}}</option>
+        {% endfor %}
+      </select>
+    </div>
+</div>
 <br>
+<div class="">
+  <label for="year3">Year: </label>
+  <select name="year3" id="year3" onchange="setScroll();this.form.submit();" class="form-select form-select-sm"
+    aria-label=".form-select-sm example">
+    {% for year in years %}
+    <option value="{{year}}">{{year}}</option>
+    {% endfor %}
+  </select>
+</div>
+<br>
+<div class="chartMenu">
+    <div class="chartCard row">
+        <div class="chartBox-wide col-md-6">
+            <canvas id="myChart3"></canvas>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+</form>
 <script>
 $(document).ready(function () {
    $(function () {
@@ -80,12 +122,16 @@ $(document).ready(function () {
       let year = {{sel_year}};
       let month = '{{sel_month}}';
       let year2 = ('{{sel_year2}}' == 'All') ? 'All' : parseInt('{{sel_year2}}');
+      let year3 = ('{{sel_year3}}' == 'All') ? 'All' : parseInt('{{sel_year3}}');
       let machine = '{{sel_machine}}';
+      let machine2 = '{{sel_machine2}}';
 
       $('#year').val(year);
       $('#month').val(month);
       $('#year2').val(year2);
+      $('#year3').val(year3);
       $('#assay2').val(machine);
+      $('#assay3').val(machine2);
    });
 });
     // setup 
@@ -166,6 +212,41 @@ const revenuedata = {
     const revenueChart = new Chart(
       document.getElementById('myChart2'),
       revenueconfig
+    );
+
+let year3 = ('{{sel_year3}}' == 'All') ? 'all years' : parseInt('{{sel_year3}}');
+const revenuedata3 = {
+      labels: [{% for i in graph3_labels %} '{{i}}', {% endfor %}],
+      datasets: [{
+        label: `Revenue from {{sel_machine2}} in ${year}`,
+        data: [{% for i in graph3_data %} {{i}}, {% endfor %}],
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.2)',
+        ],
+        borderColor: [
+          'rgba(54, 162, 235, 1)',
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    // config 
+    const revenueconfig3 = {
+      type: 'bar',
+      data: revenuedata3,
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    };
+
+    // render init block
+    const revenueChart3 = new Chart(
+      document.getElementById('myChart3'),
+      revenueconfig3
     );
 </script>
 {% endblock %}

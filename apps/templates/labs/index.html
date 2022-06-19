@@ -4,7 +4,7 @@
 
 
 {% block content %}
-
+<div >
 <div class="text-center d-flex align-items-center justify-content-center">
 <h3 class="text-center"> Overview </h3>
 </div>
@@ -15,7 +15,7 @@
 
 <div>
 <label for="year">Year: </label>
-<select name="year" id="year" onchange="this.form.submit();" class="form-select" aria-label="Default select example">
+<select name="year" id="year" onchange="setScroll();this.form.submit();" class="form-select" aria-label="Default select example">
     {% for year in years %}
     <option value="{{year}}">{{year}}</option>
     {% endfor %}
@@ -24,7 +24,7 @@
 
 <div class="col-md-6 pt-1">
 <label for="month">Month: </label>
-<select name="month" id="month" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<select name="month" id="month" onchange="setScroll();this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
     {% for month in Months %}
     <option value="{{month}}">{{month}}</option>
     {% endfor %}
@@ -33,7 +33,7 @@
 
 <div class="col-md-6 pt-1">
 <label for="Assay">Machines: </label>
-<select name="assay" id="assay" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<select name="assay" id="assay" onchange="setScroll();this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
     {% for as in Machines %}
     <option value="{{as}}">{{as}}</option>
     {% endfor %}
@@ -65,7 +65,7 @@
 </div>
 <br>
 <br>
-
+</div>
 <script>
 $(document).ready(function () {
    $(function () {

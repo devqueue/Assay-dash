@@ -44,6 +44,31 @@
 <link type="text/css" href="{% static '/assets/css/volt.css' %}" rel="stylesheet">
 <script src="{% static '/assets/js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static '/assets/js/chart.js' %}"></script>
+<script>
+  function setScroll() {
+    let scroll = window.scrollY;
+    let scrollString = scroll.toString();
+    console.log("setting scroll pos")
+    console.log(scrollString)
+    
+    localStorage.setItem("scrollPosition", scrollString);
+}
+
+
+function restoreScrollPos() {
+    let posYString = localStorage.getItem("scrollPosition");
+    let posY = parseInt(posYString);
+    console.log("Restoring scroll pos")
+    console.log(posY)
+    window.scroll(0, posY);
+    return true;
+}
+
+function clearScrollPos() {
+    localStorage.setItem("scrollPosition", '0');
+    console.log("Clearing scroll pos")
+}
+</script>
 <style>
   .chartCard {
     display: flex;
@@ -76,7 +101,7 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 </head>
-<body>
+<body onload="restoreScrollPos(); clearScrollPos()">
 
     {% include 'includes/sidebar.html' %}
     
@@ -93,6 +118,6 @@
     
   <!-- Specific Page JS goes HERE  -->
   {% block javascripts %}{% endblock javascripts %}  
-      
+
 </body>
 </html>

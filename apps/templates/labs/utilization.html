@@ -14,7 +14,7 @@
 <div class="row">
 <div class="col-md-6 pt-1">
 <label for="year">Year: </label>
-<select name="year" id="year" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<select name="year" id="year" onchange="setScroll();this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
     {% for year in years %}
     <option value="{{year}}">{{year}}</option>
     {% endfor %}
@@ -23,7 +23,7 @@
 
 <div class="col-md-6 pt-1">
 <label for="month">Month: </label>
-<select name="month" id="month" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<select name="month" id="month" onchange="setScroll();this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
     {% for month in Months %}
     <option value="{{month}}">{{month}}</option>
     {% endfor %}
@@ -44,7 +44,7 @@
 
 <div class="col-md-6 pt-1">
 <label for="assay2">Machines: </label>
-<select name="assay2" id="assay2" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<select name="assay2" id="assay2" onchange="setScroll();this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
     {% for as in Machines %}
     <option value="{{as}}">{{as}}</option>
     {% endfor %}
@@ -53,7 +53,7 @@
 
 <div class="col-md-6 pt-1">
 <label for="year2">Year: </label>
-<select name="year2" id="year2" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<select name="year2" id="year2" onchange="setScroll();this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
     {% for year in years %}
     <option value="{{year}}">{{year}}</option>
     {% endfor %}
