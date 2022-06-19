@@ -55,13 +55,21 @@ def sample(request):
     context = {
         'segment': 'lab3-samples',
     }
-    samples_obj = SamplesMachine.objects.all()
-    monthlystats_obj = monthlystatsMachine.objects.all()
+    samples_assay_obj = SamplesAssay.objects.all()
 
-    samples_serializer = SamplesSerializer(samples_obj, many=True)
+    samples_assay_serializer = AssaySamplesSerializer(samples_assay_obj, many=True)
+
+    # Assay dataframes
+    samples_assay_df = pd.DataFrame(samples_assay_serializer.data)
+
+    samples_machine_obj = SamplesMachine.objects.all()
+    monthlystats_machine_obj = monthlystatsMachine.objects.all()
+
+    samples_serializer = SamplesSerializer(samples_machine_obj, many=True)
     monthlystats_serializer = monthlystatsSerializer(
-        monthlystats_obj, many=True)
+        monthlystats_machine_obj, many=True)
 
+    # machine dataframes
     samples_df = pd.DataFrame(samples_serializer.data)
     monthlystats_df = pd.DataFrame(monthlystats_serializer.data)
 
@@ -71,33 +79,51 @@ def sample(request):
             'AssayID', 'Assay', 'Year', 'MachineID')]
         machines = samples_df['MachineID'].unique()
 
+
+        # print(samples_assay_df.column
     if request.method == 'POST':
         YEAR = request.POST['year']
         MONTH = request.POST['month']
         YEAR2 = request.POST['year2']
         MACHINE = request.POST['assay2']
+        YEAR3 = request.POST['year3']
+        MACHINE3 = request.POST['assay3']
+        MONTH3 = request.POST['month3']
 
         context |= sample_context(
-            YEAR, MONTH, YEAR2, MACHINE, samples_df, monthlystats_df)
-        return render(request, 'labs/sample.html', context)
+            YEAR, MONTH, YEAR2, MACHINE, YEAR3, MACHINE3, MONTH3, samples_df, monthlystats_df, samples_assay_df)
+        return render(request, 'labs/sample_lab3.html', context)
     else:
         if samples_df.empty:
-            return render(request, 'labs/sample.html', context)
+            return render(request, 'labs/sample_lab3.html', context)
         else:
             YEAR = years[0]
             MONTH = months[0]
             YEAR2 = years[0]
             MACHINE = machines[0]
+            YEAR3 = years[0]
+            MACHINE3 = machines[0]
+            MONTH3 = months[0]
             context |= sample_context(
-                YEAR, MONTH, YEAR2, MACHINE, samples_df, monthlystats_df)
+                YEAR, MONTH, YEAR2, MACHINE, YEAR3, MACHINE3, MONTH3, samples_df, monthlystats_df, samples_assay_df)
 
-            return render(request, 'labs/sample.html', context)
+            return render(request, 'labs/sample_lab3.html', context)
 
 
 def util(request):
     context = {
         'segment': 'lab3-util',
     }
+
+    util_assay_obj = UtilizationAssay.objects.all()
+
+    util_assay_serializer = AssaySamplesSerializer(
+        util_assay_obj, many=True)
+
+    # Assay dataframes
+    util_assay_df = pd.DataFrame(util_assay_serializer.data)
+
+
     util_obj = UtilizationMachine.objects.all()
     monthlystats_obj = monthlystatsMachine.objects.all()
 
@@ -119,30 +145,46 @@ def util(request):
         MONTH = request.POST['month']
         YEAR2 = request.POST['year2']
         MACHINE = request.POST['assay2']
+        YEAR3 = request.POST['year3']
+        MACHINE2 = request.POST['assay3']
+        MONTH3 = request.POST['month3']
 
         context |= util_context(
-            YEAR, MONTH, YEAR2, MACHINE, util_df, monthlystats_df)
+            YEAR, MONTH, YEAR2, MACHINE, YEAR3, MACHINE2, MONTH3, util_df, monthlystats_df, util_assay_df)
 
-        return render(request, 'labs/utilization.html', context)
+        return render(request, 'labs/utilization_lab3.html', context)
     else:
         if util_df.empty:
-            return render(request, 'labs/utilization.html', context)
+            return render(request, 'labs/utilization_lab3.html', context)
         else:
             YEAR = years[0]
             MONTH = months[0]
             YEAR2 = years[0]
             MACHINE = machines[0]
+            YEAR3 = years[0]
+            MACHINE2 = machines[0]
+            MONTH3 = months[0]
 
             context |= util_context(
-                YEAR, MONTH, YEAR2, MACHINE, util_df, monthlystats_df)
+                YEAR, MONTH, YEAR2, MACHINE, YEAR3, MACHINE2, MONTH3, util_df, monthlystats_df, util_assay_df)
 
-            return render(request, 'labs/utilization.html', context)
+            return render(request, 'labs/utilization_lab3.html', context)
 
 
 def revenue(request):
     context = {
         'segment': 'lab3-revenue',
     }
+    
+    revenue_assay_obj = RevenueAssay.objects.all()
+
+    revenue_assay_serializer = AssaySamplesSerializer(
+        revenue_assay_obj, many=True)
+
+    # Assay dataframes
+    revenue_assay_df = pd.DataFrame(revenue_assay_serializer.data)
+
+
     revenue_obj = RevenueMachine.objects.all()
     monthlystats_obj = monthlystatsMachine.objects.all()
 
@@ -164,24 +206,30 @@ def revenue(request):
         MONTH = request.POST['month']
         YEAR2 = request.POST['year2']
         MACHINE = request.POST['assay2']
+        YEAR3 = request.POST['year3']
+        MACHINE3 = request.POST['assay3']
+        MONTH3 = request.POST['month3']
 
         context |= revenue_context(
-            YEAR, MONTH, YEAR2, MACHINE, revenue_df, monthlystats_df)
+            YEAR, MONTH, YEAR2, MACHINE, YEAR3, MACHINE3, MONTH3, revenue_df, monthlystats_df, revenue_assay_df)
 
-        return render(request, 'labs/revenue.html', context)
+        return render(request, 'labs/revenue_lab3.html', context)
     else:
         if revenue_df.empty:
-            return render(request, 'labs/revenue.html', context)
+            return render(request, 'labs/revenue_lab3.html', context)
         else:
             YEAR = years[0]
             MONTH = months[0]
             YEAR2 = years[0]
             MACHINE = machines[0]
+            YEAR3 = years[0]
+            MACHINE3 = machines[0]
+            MONTH3 = months[0]
 
             context |= revenue_context(
-                YEAR, MONTH, YEAR2, MACHINE, revenue_df, monthlystats_df)
+                YEAR, MONTH, YEAR2, MACHINE, YEAR3, MACHINE3, MONTH3, revenue_df, monthlystats_df, revenue_assay_df)
 
-            return render(request, 'labs/revenue.html', context)
+            return render(request, 'labs/revenue_lab3.html', context)
 
 
 @login_required(login_url='/login')
