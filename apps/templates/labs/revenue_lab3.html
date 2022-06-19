@@ -216,7 +216,7 @@ const revenuedata = {
 
 let year3 = ('{{sel_year3}}' == 'All') ? 'all years' : parseInt('{{sel_year3}}');
 const revenuedata3 = {
-      labels: [{% for i in graph3_labels %} '{{i}}', {% endfor %}],
+      labels: [{% for i in graph3_labels %} '{{i | safe}}', {% endfor %}],
       datasets: [{
         label: `Revenue from {{sel_machine2}} in ${year}`,
         data: [{% for i in graph3_data %} {{i}}, {% endfor %}],
